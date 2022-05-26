@@ -52,7 +52,10 @@
     2.7.3 [Other supported barcodes](#273-other-supported-barcodes)  
   2.8 [Adding `Chart` objects to a PDF](#28-adding-chart-objects-to-a-pdf)  
   2.9 [Adding emoji to a PDF](#29-adding-emoji-to-a-pdf)  
-  2.10 [Conclusion](#210-conclusion)  
+  2.10 [Quick prototyping](#210-quick-prototyping)  
+    2.10.1 [Adding dummy text](#2101-adding-dummy-text)  
+    2.10.2 [Adding dummy images](#2102-adding-dummy-images)  
+  2.11 [Conclusion](#211-conclusion)  
 3 [Container `LayoutElement` objects](#3-container-layoutelement-objects)  
   3.1 [Lists](#31-lists)  
     3.1.1 [Working with `OrderedList`](#311-working-with-orderedlist)  
@@ -141,6 +144,7 @@
 8 [Deep Dive into `borb`](#8-deep-dive-into-borb)  
   8.1 [About PDF](#81-about-pdf)  
   8.2 [The XREF table](#82-the-xref-table)  
+    8.2.2 [Dealing with a broken XREF](#822-dealing-with-a-broken-xref)  
   8.3 [Page content streams](#83-page-content-streams)  
   8.4 [Postscript syntax](#84-postscript-syntax)  
   8.5 [Creating a `Document` using low-level syntax](#85-creating-a-document-using-low-level-syntax)  
@@ -2745,7 +2749,165 @@ if __name__ == "__main__":
 
 <div style="page-break-before: always;"></div>
 
-## 2.10 Conclusion
+## 2.10 Quick prototyping
+
+Sometimes, you'll need to quickly generate a prototype for some document to determine the layout. This can be hard if you don't yet know the exact text that will be used in the final PDF.
+Maybe the final text is still being approved by marketing, or maybe it still needs to be translated. Similar problems can happen with images.
+
+In order to make sure document creation can go ahead without having to wait for the content, `borb` comes with a couple of utility classes that allow you to easily generate dummy text and images.
+
+### 2.10.1 Adding dummy text
+
+`borb` comes with the class `Lipsum` (in `borb.pdf.canvas.lipsum.lipsum`) which has two methods:
+- : allowing you to generate the classic lorem ipsum text
+- : allowing you to generate a more Bob Ross inspired dummy text
+
+Both methods use a markov model to generate text similar to the text they've been trained on.
+
+In this first example you'll be using the classic `Lorem Ipsum Dolor Sit Amet`.
+Keep in mind the text generated here is random, it might (most probably will) come out different on your device.
+
+```python
+#!chapter_002/src/snippet_037.py
+from borb.pdf.document.document import Document
+from borb.pdf.page.page import Page
+from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
+from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
+from borb.pdf.canvas.layout.text.paragraph import Paragraph
+from borb.pdf.pdf import PDF
+from borb.pdf.canvas.lipsum.lipsum import Lipsum
+
+
+def main():
+    # create Document
+    doc: Document = Document()
+
+    # create Page
+    page: Page = Page()
+
+    # add Page to Document
+    doc.append_page(page)
+
+    # set a PageLayout
+    layout: PageLayout = SingleColumnLayout(page)
+
+    # add a Paragraph
+    layout.add(Paragraph(Lipsum.generate_lipsum_text()))
+
+    # store
+    with open("output.pdf", "wb") as pdf_file_handle:
+        PDF.dumps(pdf_file_handle, doc)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+![enter image description here](chapter_002/img/snippet_037.png)
+
+<div style="page-break-before: always;"></div>
+
+In this next example you'll be using the more whimsical Bob Ross version.
+
+```python
+#!chapter_002/src/snippet_038.py
+from borb.pdf.document.document import Document
+from borb.pdf.page.page import Page
+from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
+from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
+from borb.pdf.canvas.layout.text.paragraph import Paragraph
+from borb.pdf.pdf import PDF
+from borb.pdf.canvas.lipsum.lipsum import Lipsum
+
+
+def main():
+    # create Document
+    doc: Document = Document()
+
+    # create Page
+    page: Page = Page()
+
+    # add Page to Document
+    doc.append_page(page)
+
+    # set a PageLayout
+    layout: PageLayout = SingleColumnLayout(page)
+
+    # add a Paragraph
+    layout.add(Paragraph(Lipsum.generate_bob_ross_text()))
+
+    # store
+    with open("output.pdf", "wb") as pdf_file_handle:
+        PDF.dumps(pdf_file_handle, doc)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+![enter image description here](chapter_002/img/snippet_038.png)
+
+<div style="page-break-before: always;"></div>
+
+### 2.10.2 Adding dummy images
+
+Rather than having to wait for the pictures provided by your marketing department, you can already insert some dummy images in the PDF as a placeholder.
+Doing so is easy with the `Unsplash` class, which uses the unsplash.com API as its image provider.
+You will need to provide an API key in order to ensure you have access to these services.
+
+You can pass a desired dimension to the method. `borb` will attempt to find the `Image` whose aspect ratio best matches the one you provided. That way, if the `Image` needs to be scaled down or up, you will experience minimal distortions.
+
+```python
+#!chapter_002/src/snippet_039.py
+from borb.pdf.document.document import Document
+from borb.pdf.page.page import Page
+from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
+from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
+from borb.pdf.canvas.layout.text.paragraph import Paragraph
+from borb.pdf.pdf import PDF
+from borb.pdf.canvas.layout.image.unsplash import Unsplash
+
+from decimal import Decimal
+import keyring
+
+
+def main():
+
+    # set the unsplash API access key
+    keyring.set_password("unsplash", "access_key", "<your access key here>")
+
+    # create Document
+    doc: Document = Document()
+
+    # create Page
+    page: Page = Page()
+
+    # add Page to Document
+    doc.append_page(page)
+
+    # set a PageLayout
+    layout: PageLayout = SingleColumnLayout(page)
+
+    # add an Image from Unsplash
+    # you can specify the keywords as well as the desired dimensions
+    layout.add(Unsplash.get_image(["cherry", "blossom"], Decimal(400), Decimal(300)))
+
+    # store
+    with open("output.pdf", "wb") as pdf_file_handle:
+        PDF.dumps(pdf_file_handle, doc)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The result should look somewhat like this. Although the actual image may differ (if Unsplash suddenly decides to serve some other image as being more relevant for the keywords in the example).
+
+![enter image description here](chapter_002/img/snippet_039.png)
+
+<div style="page-break-before: always;"></div>
+
+## 2.11 Conclusion
 
 In this section you've learned the basics of creating a new PDF using `borb`. 
 In this section you've learned how various pieces of content are represented by the different `LayoutElement` implementations in `borb`. 
@@ -8441,6 +8603,24 @@ endobj
 ```
 
 `/Contents` points to the `Page` content stream. This is a string of postfix instructions (usually compressed using `deflate`).
+
+### 8.2.2 Dealing with a broken XREF
+ 
+A PDF document is considered *broken* if it no longer opens:
+- in Adobe Reader (or a similar PDF reader)
+- in `borb`
+
+The reason why those two are different criteria is that Adobe is very lenient when it comes to enforcing the PDF standards. Which is understandable, you want PDF reading software to be able to read as many documents as possible.
+
+`borb` however tends to be very strict when it comes to dealing with PDF documents (in fact most PDF generators are).
+
+When a PDF no longer opens, it is usually down to the `XREF` being incorrect. Which is to say, some byte-miscount in the document.
+Remember, the PDF document is supposed to announce at which byte the `XREF` table begins. If that byte-count is off by even 1 byte, the `XREF` table is (from the standpoint of the PDF spec) no longer in the right location.
+
+To fix this, `borb` has a last-resort parser to rebuild an `XREF`, this is the `RebuiltXREF` class.
+This parser will go over the entire PDF, looking for object declarations, and keep track of their byte count. This is effectively reverse-engineering the `XREF` document (at the cost of having to run over the entire file).
+
+Whenever `borb` is forced to do this, you may expect the logging to indicate as such.
 
 ## 8.3 Page content streams
 

@@ -1,8 +1,8 @@
 # 8 Deep Dive into `borb`
 
-![enter image description here](img/chapter_illustration.jpg)
+![enter image description here](https://raw.githubusercontent.com/jorisschellekens/borb-examples/master/chapter_008/img/chapter_illustration.jpg)
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.1 About PDF
 
@@ -188,7 +188,7 @@ Operators are prefix operators, meaning the arguments come before the operator.
 - `ET` : end text
 - `Q` : pop the last element from the graphics environment stack
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.4 Postscript syntax
 
@@ -277,7 +277,7 @@ A free copy of which can be found:
 | ' |
 | " |
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.5 Creating a `Document` using low-level syntax
 
@@ -297,7 +297,7 @@ Although this is not very practical it will do several things:
 
 In this example, you'll be creating a PDF from scratch, containing "Hello World!", using only the low-level syntax.
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.6 Fonts in PDF
 
@@ -339,7 +339,7 @@ of one or more bytes are decoded to select a glyph from the descendant CIDFont.
 This facility supports the use of very large character sets, such as those for the Chinese, Japanese, and
 Korean languages. It also simplifies the organization of fonts that have complex encoding requirements.
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.7 About structured vs. unstructured document formats
 
@@ -516,7 +516,7 @@ finally, `SimpleTextExtraction` stores the reconstituted text (to ensure fast lo
 
 :mega: todo :mega:
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 ## 8.8 Hyphenation
 
@@ -663,8 +663,8 @@ if __name__ == "__main__":
 
 In the final PDF you can see the word "survived" was hyphenated as well as the word "essentially".
 
-![enter image description here](img/borb_in_action_example_083.png)
+![enter image description here](https://raw.githubusercontent.com/jorisschellekens/borb-examples/master/chapter_008/img/borb_in_action_example_083.png)
 
-<div style="page-break-before: always;"></div>
+{pagebreak}
 
 
