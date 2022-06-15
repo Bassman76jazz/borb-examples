@@ -4,6 +4,7 @@ from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnL
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 from borb.pdf.pdf import PDF
 from borb.pdf.canvas.layout.image.image import Image
+from pathlib import Path
 
 from decimal import Decimal
 
